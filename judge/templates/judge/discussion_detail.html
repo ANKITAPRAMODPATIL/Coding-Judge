@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <!-- Main Question -->
+            <div class="card bg-dark text-light border-secondary p-4 shadow mb-4">
+                <h3 class="text-info mb-2">{{ discussion.title }}</h3>
+                <small class="text-muted mb-3">Asked by <strong>{{ discussion.user.username }}</strong> on {{ discussion.created_at|date:"M d, Y H:i" }}</small>
+                <hr class="border-secondary">
+                <p class="fs-6" style="white-space: pre-line;">{{ discussion.body }}</p>
+            </div>
+
+            <!-- Comments / Replies -->
+            <h4 class="text-info mb-3">Replies ({{ discussion.comments.count }})</h4>
+            
+            {% for comment in discussion.comments.all %}
+            <div class="card bg-dark text-light border-secondary p-3 shadow mb-3">
+                <div class="d-flex justify-content-between">
+                    <strong class="text-warning">{{ comment.user.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                <p class="mt-2 mb-0" style="white-space: pre-line;">{{ comment.body }}</p>
+            </div>
+            {% empty %}
+            <div class="card bg-dark text-light border-secondary p-3 text-center mb-3">
+                <p class="text-muted mb-0">No replies yet. Share your thoughts below!</p>
+            </div>
+            {% endfor %}
+
+            <!-- Add Reply Form -->
+            <div class="card bg-dark text-light border-secondary p-4 shadow mt-4">
+                <h5 class="text-info mb-3">Leave a Reply</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="body" rows="3" class="form-control bg-black text-light border-secondary" placeholder="Write your reply..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Reply</button>
+                </form>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'problem_discussions' discussion.problem.id %}" class="btn btn-outline-light">Back to Discussions</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

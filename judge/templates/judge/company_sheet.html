@@ -1,0 +1,25 @@
+{% extends 'judge/base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ company_name }} Sheet</title>
+    <style>
+        body { background: #0d1117; color: #c9d1d9; font-family: Arial, sans-serif; padding: 20px; }
+        .problem-card { background: #161b22; padding: 15px; margin-bottom: 10px; border-radius: 6px; max-width: 700px; }
+    </style>
+</head>
+<body>
+    <h2>{{ company_name }} Interview Questions</h2>
+    {% for problem in problems %}
+    <div class="problem-card">
+        <h3>{{ problem.title }}</h3>
+        <p>Difficulty: {{ problem.difficulty }}</p>
+    </div>
+    {% empty %}
+    <p>No questions added for this company yet.</p>
+    {% endfor %}
+</body>
+</html>
+{% endblock %}

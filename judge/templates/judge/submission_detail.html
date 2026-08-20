@@ -1,0 +1,49 @@
+{% extends 'judge/base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submission Details</title>
+</head>
+<body>
+    <h1>Submission #{{ submission.id }}</h1>
+    
+    
+    <div>
+        <span id="status-badge">{{ submission.status }}</span>
+    </div>
+    <div id="status-message">
+        
+    </div>
+
+    
+    <script>
+        const submissionId = "{{ submission.id }}";
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const submissionSocket = new WebSocket(
+            wsScheme + '://' + window.location.host + '/ws/submission/' + submissionId + '/'
+        );
+
+        submissionSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            
+            document.getElementById('status-badge').innerText = data.status;
+            document.getElementById('status-message').innerText = data.message;
+            
+            if (data.status === 'Accepted' || data.status === 'Wrong Answer' || data.status === 'Error') {
+                submissionSocket.close();
+            }
+        };
+
+        submissionSocket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly');
+        };
+    </script>
+</body>
+</html>
+{% endblock %}
+
+
+
+

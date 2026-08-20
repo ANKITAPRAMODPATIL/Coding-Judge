@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4 mb-5">
+    <h2 class="mb-4 fw-bold text-amber-400">Topic-wise Progress & Weak Areas</h2>
+
+    {% for topic, stats in topic_stats.items %}
+    <div class="progress-card p-4 mb-3 rounded-4 shadow-lg bg-[#242424] text-slate-100 border border-neutral-700" style="max-width: 600px;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong class="fs-5 text-slate-200">{{ topic }}</strong>
+            <span class="text-slate-400 small fw-semibold">{{ stats.solved }} / {{ stats.total }} solved</span>
+        </div>
+        <div class="progress-bar-container bg-neutral-800 rounded-pill overflow-hidden" style="height: 10px; margin-top: 8px; border: 1px solid #404040;">
+            <div class="progress-bar bg-amber-500 rounded-pill" style="height: 100%; width: {% if stats.total > 0 %}{% widthratio stats.solved stats.total 100 %}{% else %}0{% endif %}%; transition: width 0.6s ease;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

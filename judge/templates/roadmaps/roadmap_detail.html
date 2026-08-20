@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ roadmap.title }}</title>
+</head>
+<body>
+    <h1>{{ roadmap.title }}</h1>
+    <p>{{ roadmap.description }}</p>
+
+    <hr>
+
+    <h3>Steps & Practice Problems</h3>
+    {% for step in steps %}
+        <div style="margin-bottom: 20px;">
+            <h4>{{ step.order }}. {{ step.title }}</h4>
+            <ul>
+                {% for problem in step.problems.all %}
+                    <li><a href="#">{{ problem.name }}</a></li>
+                {% empty %}
+                    <li>No problems added in this step yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+
+    <br>
+    <a href="{% url 'roadmap_list' %}">&larr; Back to Roadmaps</a>
+</body>
+</html>

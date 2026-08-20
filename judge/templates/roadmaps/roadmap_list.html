@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Learning Roadmaps</title>
+</head>
+<body>
+    <h1>Learning Roadmaps</h1>
+    <ul>
+        {% for roadmap in roadmaps %}
+            <li>
+                <a href="{% url 'roadmap_detail' roadmap.slug %}">
+                    <h2>{{ roadmap.title }}</h2>
+                </a>
+                <p>{{ roadmap.description }}</p>
+            </li>
+        {% empty %}
+            <p>No roadmaps available yet.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>

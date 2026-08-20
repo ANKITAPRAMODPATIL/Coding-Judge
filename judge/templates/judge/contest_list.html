@@ -1,0 +1,32 @@
+{% extends 'judge/base.html' %}
+{% block content %}
+<div style="max-width: 900px; margin: 30px auto; color: #fff; padding: 20px; background: #252526; border-radius: 8px; border: 1px solid #333;">
+    <h2>🏆 Coding Contests</h2>
+    <hr style="border-color: #444; margin: 15px 0;">
+
+    {% if contests %}
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            {% for contest in contests %}
+            <div style="background: #1e1e1e; padding: 15px; border-radius: 6px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0 0 5px 0; color: #4ec9b0;">{{ contest.title }}</h3>
+                    <p style="margin: 0; color: #aaa; font-size: 13px;">{{ contest.description }}</p>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #f1c40f;">
+                        Start: {{ contest.start_time|date:"M d, Y - H:i" }} | End: {{ contest.end_time|date:"M d, Y - H:i" }}
+                    </p>
+                </div>
+                <div>
+                    {% if request.user in contest.participants.all %}
+                        <a href="{% url 'contest_detail' contest.id %}" style="background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 13px;">Enter Contest</a>
+                    {% else %}
+                        <a href="{% url 'join_contest' contest.id %}" style="background: #007acc; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 13px;">Join Contest</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="color: #aaa;">No contests available right now. Check back later!</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'judge/base.html' %}
+{% block content %}
+<div style="max-width: 900px; margin: 30px auto; color: #fff; padding: 20px; background: #252526; border-radius: 8px; border: 1px solid #333;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>⚡ {{ contest.title }}</h2>
+        <div id="timer-box" style="background: #1e1e1e; padding: 8px 15px; border-radius: 5px; border: 1px solid #444; font-weight: bold; color: #f1c40f;">
+            Time Left: <span id="countdown">Loading...</span>
+        </div>
+    </div>
+    
+    <p style="color: #aaa; margin-top: 10px;">{{ contest.description }}</p>
+    <hr style="border-color: #444; margin: 15px 0;">
+
+    <h3 style="color: #4ec9b0;">Contest Problems:</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+        {% for problem in contest.problems.all %}
+        <div style="background: #1e1e1e; padding: 12px 15px; border-radius: 5px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold;">{{ forloop.counter }}. {{ problem.title }}</span>
+            <a href="{% url 'problem_detail' problem.id %}" style="background: #007acc; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;">Solve Problem</a>
+        </div>
+        {% empty %}
+        <p style="color: #aaa;">No problems added to this contest yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript Live Countdown Timer -->
+<script>
+const endTime = new Date("{{ contest.end_time|date:'Y-m-d H:i:s' }}").getTime();
+
+const timer = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = endTime - now;
+
+    if (distance < 0) {
+        clearInterval(timer);
+        document.getElementById("countdown").innerText = "Contest Ended";
+        document.getElementById("timer-box").style.color = "#dc3545";
+        return;
+    }
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("countdown").innerText = 
+        hours + "h " + minutes + "m " + seconds + "s ";
+}, 1000);
+</script>
+{% endblock %}

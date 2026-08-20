@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Activity Heatmap</title>
+    <style>
+        .heatmap-container { display: flex; flex-wrap: wrap; gap: 4px; max-width: 800px; padding: 20px; background: #161b22; border-radius: 6px; }
+        .day-box { width: 12px; height: 12px; background-color: #21262d; border-radius: 2px; }
+        .level-1 { background-color: #0e4429; }
+        .level-2 { background-color: #006d32; }
+        .level-3 { background-color: #26a641; }
+        .level-4 { background-color: #39d353; }
+    </style>
+</head>
+<body style="background: #0d1117; color: #c9d1d9; font-family: Arial, sans-serif;">
+    <h2>My Activity Heatmap</h2>
+    <div class="heatmap-container" id="heatmap"></div>
+
+    <script>
+        const activityData = {{ activity_dict|safe }};
+        const heatmapContainer = document.getElementById('heatmap');
+
+        
+        for (let i = 365; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            
+            const box = document.createElement('div');
+            box.className = 'day-box';
+            
+            const count = activityData[dateStr] || 0;
+            if (count > 0 && count <= 2) box.classList.add('level-1');
+            else if (count > 2 && count <= 5) box.classList.add('level-2');
+            else if (count > 5 && count <= 8) box.classList.add('level-3');
+            else if (count > 8) box.classList.add('level-4');
+            
+            box.title = `${dateStr}: ${count} contributions`;
+            heatmapContainer.appendChild(box);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.login-wrapper{
+    min-height:75vh;
+    display:flex;
+    align-items:center;
+}
+
+.login-card{
+    background: #242424;
+    border:1px solid #333333;
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+.brand-panel{
+    background: linear-gradient(135deg,#f59e0b,#d97706,#b45309);
+    color:#121212;
+    padding:50px;
+    height:100%;
+    position:relative;
+}
+
+.brand-panel::before{
+    content:'';
+    position:absolute;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    top:-60px;
+    right:-60px;
+}
+
+.brand-panel::after{
+    content:'';
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    bottom:-50px;
+    left:-50px;
+}
+
+.brand-content{
+    position:relative;
+    z-index:2;
+}
+
+.login-form-area{
+    padding:50px;
+}
+
+.login-title{
+    font-size:2rem;
+    font-weight:700;
+    color: #f8fafc;
+}
+
+.custom-input{
+    background: #1a1a1a !important;
+    border: 1px solid #404040 !important;
+    color: #f8fafc !important;
+    height:52px;
+}
+
+.custom-input:focus{
+    border-color:#f59e0b !important;
+    box-shadow:0 0 0 0.15rem rgba(245,158,11,.25);
+}
+
+.input-group-text{
+    background: #1a1a1a !important;
+    border: 1px solid #404040 !important;
+    color:#f59e0b;
+}
+
+.login-btn{
+    height:52px;
+    border-radius:12px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.login-btn:hover{
+    transform:translateY(-2px);
+}
+
+.feature-item{
+    margin-bottom:15px;
+    font-weight: 500;
+}
+
+.feature-item i{
+    margin-right:10px;
+}
+
+.password-toggle{
+    cursor:pointer;
+}
+
+@media(max-width:768px){
+    .brand-panel{
+        display:none;
+    }
+
+    .login-form-area{
+        padding:30px;
+    }
+}
+</style>
+
+<div class="login-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="login-card">
+
+                    <div class="row g-0">
+
+                        <!-- Left Side -->
+                        <div class="col-lg-5">
+                            <div class="brand-panel">
+
+                                <div class="brand-content">
+
+                                    <div class="mb-4">
+                                        <i class="bi bi-code-square display-3"></i>
+                                    </div>
+
+                                    <h2 class="fw-bold mb-3">
+                                        Online Judge System
+                                    </h2>
+
+                                    <p class="mb-5 opacity-75">
+                                        Practice coding, solve challenges, track progress and improve your programming skills.
+                                    </p>
+
+                                    <div class="feature-item">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Coding Challenges
+                                    </div>
+
+                                    <div class="feature-item">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        AI Powered Assistance
+                                    </div>
+
+                                    <div class="feature-item">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Real-time Evaluation
+                                    </div>
+
+                                    <div class="feature-item">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Performance Analytics
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Right Side -->
+                        <div class="col-lg-7">
+                            <div class="login-form-area">
+
+                                <div class="text-center mb-4">
+                                    <h2 class="login-title">Welcome Back</h2>
+                                    <p class="text-slate-400">
+                                        Sign in to continue your coding journey
+                                    </p>
+                                </div>
+
+                                {% if form.errors %}
+                                <div class="alert alert-danger bg-danger bg-opacity-25 border-danger text-danger">
+                                    Invalid username or password.
+                                </div>
+                                {% endif %}
+
+                                <form method="POST">
+                                    {% csrf_token %}
+
+                                    <div class="mb-3">
+                                        <label class="form-label text-slate-300">
+                                            Username
+                                        </label>
+
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-person"></i>
+                                            </span>
+
+                                            <input type="text"
+                                                   name="username"
+                                                   id="id_username"
+                                                   class="form-control custom-input"
+                                                   placeholder="Enter username"
+                                                   required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label text-slate-300">
+                                            Password
+                                        </label>
+
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-lock"></i>
+                                            </span>
+
+                                            <input type="password"
+                                                   name="password"
+                                                   id="password"
+                                                   class="form-control custom-input"
+                                                   placeholder="Enter password"
+                                                   required>
+
+                                            <span class="input-group-text password-toggle"
+                                                  onclick="togglePassword()">
+                                                <i class="bi bi-eye" id="eyeIcon"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                                        <div class="form-check">
+                                            <input class="form-check-input bg-dark border-secondary"
+                                                   type="checkbox"
+                                                   id="remember">
+                                            <label class="form-check-label text-slate-400">
+                                                Remember me
+                                            </label>
+                                        </div>
+
+                                        <a href="{% url 'password_reset' %}"
+                                           class="text-warning text-decoration-none">
+                                            Forgot Password?
+                                        </a>
+
+                                    </div>
+
+                                    <button type="submit"
+                                            class="btn btn-warning text-neutral-950 w-100 login-btn fw-bold">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                                        Sign In
+                                    </button>
+
+                                </form>
+
+                                <div class="text-center mt-4">
+
+                                    <span class="text-slate-400">
+                                        Don't have an account?
+                                    </span>
+
+                                    <a href="{% url 'register' %}"
+                                       class="text-warning fw-semibold text-decoration-none ms-1">
+                                        Create Account
+                                    </a>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(){
+    const password=document.getElementById("password");
+    const eye=document.getElementById("eyeIcon");
+
+    if(password.type==="password"){
+        password.type="text";
+        eye.classList.remove("bi-eye");
+        eye.classList.add("bi-eye-slash");
+    }else{
+        password.type="password";
+        eye.classList.remove("bi-eye-slash");
+        eye.classList.add("bi-eye");
+    }
+}
+</script>
+
+{% endblock %}

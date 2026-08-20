@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2 class="text-info mb-3">💬 Discussions: {{ problem.title }}</h2>
+            <hr class="border-secondary mb-4">
+
+            <!-- New Discussion Form -->
+            <div class="card bg-dark text-light border-secondary p-4 shadow mb-4">
+                <h4 class="text-warning mb-3">Ask a Question / Start Discussion</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Title / Topic</label>
+                        <input type="text" name="title" class="form-control bg-black text-light border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Your Doubt / Message</label>
+                        <textarea name="body" rows="3" class="form-control bg-black text-light border-secondary" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Discussion</button>
+                </form>
+            </div>
+
+            <!-- Discussions List -->
+            <h4 class="text-info mb-3">Community Discussions</h4>
+            {% if discussions %}
+                {% for disc in discussions %}
+                <div class="card bg-dark text-light border-secondary p-3 shadow mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-1"><a href="{% url 'discussion_detail' disc.id %}" class="text-decoration-none text-info">{{ disc.title }}</a></h5>
+                        <small class="text-muted">By {{ disc.user.username }} on {{ disc.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <p class="text-muted mt-2 mb-2">{{ disc.body|truncatechars:150 }}</p>
+                    <div>
+                        <a href="{% url 'discussion_detail' disc.id %}" class="btn btn-sm btn-outline-light">View Replies ({{ disc.comments.count }})</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card bg-dark text-light border-secondary p-4 text-center">
+                    <p class="text-muted mb-0">No discussions yet. Be the first to start one!</p>
+                </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'problem_detail' problem.id %}" class="btn btn-outline-light">Back to Problem</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

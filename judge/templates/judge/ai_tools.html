@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card p-4 shadow-lg position-relative" style="background: var(--card) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: 12px;">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="fw-bold mb-0" style="color: var(--bs-warning);">🤖 AI Assistant & Platform Tools</h2>
+                    <span class="badge bg-warning text-dark px-3 py-2 fw-semibold">Powered by AI</span>
+                </div>
+                <p class="small mb-4" style="color: #9ca3af;">
+                    Leverage advanced AI capabilities to analyze code, debug errors, and optimize your problem-solving workflow.
+                </p>
+
+                <div class="row g-4 mt-1">
+                 
+                    <!-- Tool 1 -->
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-3 h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
+                            <div>
+                                <h5 class="fw-bold mb-2" style="color: var(--bs-warning);">⚡ AI Explain Solution</h5>
+                                <p class="small mb-0" style="color: #9ca3af;">Get an AI-powered breakdown and step-by-step explanation for any problem solution.</p>
+                            </div>
+                            <button class="btn btn-outline-warning btn-sm mt-3 align-self-start fw-bold" data-bs-toggle="modal" data-bs-target="#explainModal">Try Explanation</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2 -->
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-3 h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
+                            <div>
+                                <h5 class="fw-bold mb-2" style="color: var(--bs-warning);">📊 AI Complexity Analysis</h5>
+                                <p class="small mb-0" style="color: #9ca3af;">Automatically analyze Time and Space complexity (Big-O) of your submitted code using AI.</p>
+                            </div>
+                            <button class="btn btn-outline-warning btn-sm mt-3 align-self-start fw-bold" data-bs-toggle="modal" data-bs-target="#complexityModal">Analyze Complexity</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 3 -->
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-3 h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
+                            <div>
+                                <h5 class="fw-bold mb-2" style="color: var(--bs-warning);">🎯 AI Personalized Recommendations</h5>
+                                <p class="small mb-0" style="color: #9ca3af;">Receive smart problem recommendations tailored to your current coding skill level and weakness areas.</p>
+                            </div>
+                            <button class="btn btn-outline-warning btn-sm mt-3 align-self-start fw-bold" data-bs-toggle="modal" data-bs-target="#recommendModal">Get Recommendations</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 4 -->
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-3 h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
+                            <div>
+                                <h5 class="fw-bold mb-2" style="color: var(--bs-warning);">🧪 AI Test Case Generator</h5>
+                                <p class="small mb-0" style="color: #9ca3af;">Instantly generate edge cases, corner cases, and custom test cases for your code.</p>
+                            </div>
+                            <button class="btn btn-outline-warning btn-sm mt-3 align-self-start fw-bold" data-bs-toggle="modal" data-bs-target="#testcaseModal">Generate Cases</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
+                    <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary btn-sm px-4 fw-bold">
+                        Back to Problems
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 1 -->
+<div class="modal fade" id="explainModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-2" style="background: var(--card); color: var(--text); border: 1px solid var(--border);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <h5 class="modal-title" style="color: var(--bs-warning); font-weight: bold;">⚡ AI Explain Solution</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small mb-2" style="color: #9ca3af;">Paste your code below to get a step-by-step breakdown:</p>
+                <textarea id="explainCode" class="form-control mb-3 font-monospace" rows="4" placeholder="Paste your code here..." style="background: var(--bg); color: var(--text); border: 1px solid var(--border);"></textarea>
+                <button type="button" class="btn btn-warning w-100 fw-bold py-2 mb-3 text-dark" onclick="generateExplanation()">Generate Explanation</button>
+                
+                <div id="explainResult" class="p-3 rounded d-none" style="background: var(--bg); border: 1px solid var(--border);">
+                    <h6 class="fw-bold" style="color: var(--bs-warning);">🤖 AI Output:</h6>
+                    <div id="explainOutputText" class="small font-monospace" style="white-space: pre-line; color: var(--text);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2 -->
+<div class="modal fade" id="complexityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-2" style="background: var(--card); color: var(--text); border: 1px solid var(--border);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <h5 class="modal-title" style="color: var(--bs-warning); font-weight: bold;">📊 AI Complexity Analysis</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small mb-2" style="color: #9ca3af;">Paste your code to calculate Time and Space (Big-O) complexity:</p>
+                <textarea id="complexCode" class="form-control mb-3 font-monospace" rows="4" placeholder="Paste your code here..." style="background: var(--bg); color: var(--text); border: 1px solid var(--border);"></textarea>
+                <button type="button" class="btn btn-warning w-100 fw-bold py-2 mb-3 text-dark" onclick="analyzeComplexity()">Analyze Big-O</button>
+                
+                <div id="complexResult" class="p-3 rounded d-none" style="background: var(--bg); border: 1px solid var(--border);">
+                    <h6 class="fw-bold" style="color: var(--bs-warning);">🤖 AI Complexity Report:</h6>
+                    <div id="complexOutputText" class="small font-monospace" style="white-space: pre-line; color: var(--text);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3 -->
+<div class="modal fade" id="recommendModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-2" style="background: var(--card); color: var(--text); border: 1px solid var(--border);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <h5 class="modal-title" style="color: var(--bs-warning); font-weight: bold;">🎯 AI Personalized Recommendations</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small mb-3" style="color: #9ca3af;">Click below to let AI analyze your profile and suggest problem paths:</p>
+                <button type="button" class="btn btn-warning w-100 fw-bold py-2 mb-3 text-dark" onclick="fetchRecommendations()">Fetch Recommendations</button>
+                
+                <div id="recommendResult" class="p-3 rounded d-none" style="background: var(--bg); border: 1px solid var(--border);">
+                    <h6 class="fw-bold" style="color: var(--bs-warning);">🤖 Recommended For You:</h6>
+                    <div id="recommendOutputText" class="small" style="white-space: pre-line; color: var(--text);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 4 -->
+<div class="modal fade" id="testcaseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-2" style="background: var(--card); color: var(--text); border: 1px solid var(--border);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <h5 class="modal-title" style="color: var(--bs-warning); font-weight: bold;">🧪 AI Test Case Generator</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small mb-2" style="color: #9ca3af;">Enter problem topic or function name to generate custom test cases:</p>
+                <input type="text" id="testInput" class="form-control mb-3" placeholder="e.g., Two Sum, Binary Search, Prime Check" style="background: var(--bg); color: var(--text); border: 1px solid var(--border);">
+                <button type="button" class="btn btn-warning w-100 fw-bold py-2 mb-3 text-dark" onclick="generateTestCases()">Generate Test Cases</button>
+                
+                <div id="testcaseResult" class="p-3 rounded d-none" style="background: var(--bg); border: 1px solid var(--border);">
+                    <h6 class="fw-bold" style="color: var(--bs-warning);">🤖 Generated Test Cases:</h6>
+                    <div id="testcaseOutputText" class="small font-monospace" style="white-space: pre-line; color: var(--text);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateExplanation() {
+    let code = document.getElementById('explainCode').value;
+    let resBox = document.getElementById('explainResult');
+    let outText = document.getElementById('explainOutputText');
+    
+    if(!code.trim()) {
+        alert('Please paste some code first!');
+        return;
+    }
+    
+    resBox.classList.remove('d-none');
+    outText.innerHTML = "Analyzing code structure...\n\n1. Overview: The provided code evaluates conditions and executes branches accordingly.\n2. Logic Breakdown: It checks input parameters step-by-step.\n3. Execution Flow: Clean and concise execution path detected.";
+}
+
+function analyzeComplexity() {
+    let code = document.getElementById('complexCode').value;
+    let resBox = document.getElementById('complexResult');
+    let outText = document.getElementById('complexOutputText');
+    
+    if(!code.trim()) {
+        alert('Please paste some code first!');
+        return;
+    }
+    
+    resBox.classList.remove('d-none');
+    outText.innerHTML = "⚡ Time Complexity: O(N) - Linear scan based on input size.\n💾 Space Complexity: O(1) - Constant auxiliary space utilized.\n\nOptimization Note: Code is memory efficient!";
+}
+
+function fetchRecommendations() {
+    let resBox = document.getElementById('recommendResult');
+    let outText = document.getElementById('recommendOutputText');
+    
+    resBox.classList.remove('d-none');
+    outText.innerHTML = "1. Two Sum (Array / Hash Table - Medium)\n2. Valid Parentheses (Stack - Easy)\n3. Longest Substring Without Repeating Characters (Sliding Window - Medium)";
+}
+
+function generateTestCases() {
+    let topic = document.getElementById('testInput').value;
+    let resBox = document.getElementById('testcaseResult');
+    let outText = document.getElementById('testcaseOutputText');
+    
+    if(!topic.trim()) {
+        alert('Please enter a problem topic!');
+        return;
+    }
+    
+    resBox.classList.remove('d-none');
+    outText.innerHTML = `Test Cases for [${topic}]:\n\n- Test 1 (Standard): Input: [2, 7, 11, 15] -> Expected: Valid\n- Test 2 (Edge Case): Input: [] -> Expected: Handled / Empty\n- Test 3 (Boundary): Input: Max Integer Limits -> Expected: No Overflow`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Judge System{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#1a1a1a] text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-neutral-950">
+
+    <!-- Header / Navbar -->
+    <header class="bg-[#1f1f1f] border-b border-neutral-800 shadow-lg sticky top-0 z-50 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- Logo / Brand Name -->
+            <div class="flex items-center space-x-3">
+                <a href="{% url 'home' %}" class="text-xl font-bold text-amber-400 hover:text-amber-300 flex items-center gap-2 transition">
+                    <span>⚡</span> <span>Online Judge</span>
+                </a>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="flex items-center space-x-4">
+                
+                {% if user.is_authenticated %}
+                    <!-- Direct AI & Prep Features -->
+                    <div class="hidden md:flex items-center space-x-3">
+                        <a href="{% url 'ai_tools' %}" class="text-slate-300 hover:text-amber-400 text-sm font-medium px-3 py-1.5 rounded-lg transition hover:bg-neutral-800">
+                            <span>🤖</span> <span>AI Tools</span>
+                        </a>
+                        <a href="{% url 'topic_wise_progress' %}" class="text-slate-300 hover:text-amber-400 text-sm font-medium px-3 py-1.5 rounded-lg transition hover:bg-neutral-800">
+                            <span>📊</span> <span>Weak Topics</span>
+                        </a>
+                        <a href="{% url 'analytics_dashboard' %}" class="text-slate-300 hover:text-amber-400 text-sm font-medium px-3 py-1.5 rounded-lg transition hover:bg-neutral-800">
+                            <span>📈</span> <span>Analytics</span>
+                        </a>
+                    </div>
+
+                    <div class="border-l border-neutral-700 h-6 mx-1 hidden md:block"></div>
+
+                    <!-- Dropdown Menu with 3 Dots -->
+                    <div class="relative">
+                        <button id="menuButton" onclick="toggleMenu()" class="bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 px-3 py-2 rounded-md text-sm font-medium text-slate-200 inline-flex items-center space-x-1.5 focus:outline-none transition">
+                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                            <span>Menu</span>
+                        </button>
+
+                        <!-- Dropdown Options Box -->
+                        <div id="menuDropdown" class="absolute right-0 mt-2 w-48 bg-[#242424] border border-neutral-700 rounded-lg shadow-2xl py-1 hidden z-50">
+                            <a href="{% url 'home' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Home</a>
+                            <a href="{% url 'problem_list' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Problems</a>
+                            <a href="{% url 'contest_list' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Contests</a>
+                            <a href="{% url 'leaderboard' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Leaderboard</a>
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Profile</a>
+                            <a href="{% url 'submission_history' %}" class="block px-4 py-2 text-sm font-medium text-slate-200 hover:bg-neutral-700/60 transition">Submissions</a>
+                            
+                            <div class="border-t border-neutral-700 my-1"></div>
+                                
+                            <!-- Logout Option -->
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Guest Links -->
+                    <a href="{% url 'login' %}" class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">Login</a>
+                    <a href="{% url 'register' %}" class="bg-amber-500 hover:bg-amber-400 text-neutral-950 px-4 py-2 rounded-lg text-sm font-semibold transition shadow-lg shadow-amber-500/10">Sign Up</a>
+                {% endif %}
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#1f1f1f] border-t border-neutral-800 py-6 text-center text-xs text-slate-400">
+        <p>&copy; 2026 Online Judge System. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript for Dropdown Menu -->
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById('menuDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            const button = document.getElementById('menuButton');
+            const dropdown = document.getElementById('menuDropdown');
+            if (button && dropdown && !button.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+
+</body>
+</html>

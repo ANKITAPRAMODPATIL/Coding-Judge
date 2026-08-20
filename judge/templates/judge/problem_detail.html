@@ -1,0 +1,299 @@
+{% extends 'judge/base.html' %}
+{% block content %}
+<div class="coding-workspace" style="display: flex; height: calc(100vh - 70px); gap: 10px; padding: 10px; background: #1e1e1e; color: #fff; box-sizing: border-box;">
+    
+    <!-- Left Panel: Problem Description & Editorial -->
+    <div class="problem-panel" style="flex: 1; background: #252526; padding: 20px; overflow-y: auto; border-radius: 8px; border: 1px solid #333;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; color: #fff;">{{ problem.title }}</h2>
+            <div>
+                <a href="{% url 'submission_history' %}" style="background: #007acc; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;">My Submissions</a>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px;">
+            <span style="background: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Difficulty: {{ problem.difficulty }}</span>
+            {% if problem.tags %}
+            <span style="background: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px;">Tags: {{ problem.tags }}</span>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 10px; color: #aaa; font-size: 13px;">
+            {% if problem.time_complexity %}
+                <span style="margin-right: 15px;"><strong>Time Complexity:</strong> {{ problem.time_complexity }}</span>
+            {% endif %}
+            {% if problem.space_complexity %}
+                <span><strong>Space Complexity:</strong> {{ problem.space_complexity }}</span>
+            {% endif %}
+        </div>
+        
+        <hr style="border-color: #444; margin: 15px 0;">
+        
+        <div class="description" style="margin-top: 15px; line-height: 1.6; color: #dcdcdc; white-space: pre-line;">
+           {{ problem.description|safe }}
+        </div>
+        
+        {% if problem.sample_input %}
+        <h4 style="margin-top: 20px; color: #4ec9b0;">Sample Input:</h4>
+        <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; color: #ce9178; white-space: pre-wrap;">{{ problem.sample_input }}</pre>
+        {% endif %}
+        
+        {% if problem.sample_output %}
+        <h4 style="margin-top: 15px; color: #4ec9b0;">Sample Output:</h4>
+        <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; color: #ce9178; white-space: pre-wrap;">{{ problem.sample_output }}</pre>
+        {% endif %}
+
+        <!-- Editorial Section -->
+        <div class="accordion mt-4" id="editorialAccordion" style="margin-top: 20px;">
+            <div class="accordion-item" style="background: #1e1e1e; border: 1px solid #444; border-radius: 5px;">
+                <h2 class="accordion-header" style="margin: 0;">
+                    <button type="button" id="editorial-toggle"
+                        style="background: #252526; color: #4ec9b0; font-weight: bold; border: none; width: 100%; text-align: left; padding: 12px 15px; border-radius: 5px; cursor: pointer;">
+                        📖 View Editorial & Solutions
+                    </button>
+                </h2>
+
+                <div id="collapseEditorial" style="display: none; padding: 15px; background: #1e1e1e; border-top: 1px solid #444;">
+                    {% if editorial %}
+                        <div style="color: #dcdcdc; line-height: 1.5; margin-bottom: 15px;">
+                            {{ editorial.explanation }}
+                        </div>
+
+                        {% if editorial.python_code %}
+                        <h5 style="color: #3498db; margin-bottom: 5px;">Python Solution:</h5>
+                        <pre style="background: #252526; padding: 10px; border-radius: 4px; color: #dcdcdc;"><code>{{ editorial.python_code }}</code></pre>
+                        {% endif %}
+
+                        {% if editorial.cpp_code %}
+                        <h5 style="color: #3498db; margin-bottom: 5px;">C++ Solution:</h5>
+                        <pre style="background: #252526; padding: 10px; border-radius: 4px; color: #dcdcdc;"><code>{{ editorial.cpp_code }}</code></pre>
+                        {% endif %}
+
+                        {% if editorial.time_complexity %}
+                        <p style="color: #aaa; font-size: 13px;"><strong>Time Complexity:</strong> {{ editorial.time_complexity }}</p>
+                        {% endif %}
+
+                        {% if editorial.space_complexity %}
+                        <p style="color: #aaa; font-size: 13px;"><strong>Space Complexity:</strong> {{ editorial.space_complexity }}</p>
+                        {% endif %}
+                    {% else %}
+                        <p style="color: #888; margin: 0;">Editorial for this problem is coming soon.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'problem_discussions' problem.id %}" class="btn btn-info" style="background: #17a2b8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 13px;">💬 Discussions</a>
+        </div>
+    </div>
+    
+    <!-- Right Panel: Code Editor & Outputs -->
+    <div class="editor-panel" style="flex: 1; display: flex; flex-direction: column; background: #252526; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-y: auto;">
+        
+        <form method="POST" id="editor-form" style="display: flex; flex-direction: column; flex-grow: 1;">
+            {% csrf_token %}
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <label style="font-weight: bold; margin-right: 5px; font-size: 13px;">Language: </label>
+                    <select name="language" style="background: #333; color: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #555;">
+                        <option value="python" {% if selected_lang == 'python' %}selected{% endif %}>Python 3</option>
+                        <option value="cpp" {% if selected_lang == 'cpp' %}selected{% endif %}>C++</option>
+                        <option value="javascript" {% if selected_lang == 'javascript' %}selected{% endif %}>JavaScript</option>
+                    </select>
+                </div>
+
+                <button type="button" id="hint-btn" onclick="fetchHint({{ problem.id }})" style="background: #9b59b6; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">💡 Get AI Hint</button>
+            </div>
+
+            <!-- AI Hint Box -->
+            <div id="hint-box" style="margin-bottom: 10px; padding: 10px; background: #1e1e1e; border-radius: 5px; border: 1px solid #444; display: none;">
+                <strong style="color: #f1c40f;">AI Hint:</strong>
+                <p id="hint-text" style="margin: 5px 0 0 0; color: #dcdcdc; font-size: 13px;"></p>
+            </div>
+
+            <!-- Code Textarea -->
+            <textarea name="code" id="code-editor" placeholder="Write your code here..." style="width: 100%; height: 200px; background: #1e1e1e; color: #dcdcdc; font-family: 'Courier New', Courier, monospace; font-size: 14px; padding: 12px; border-radius: 5px; border: 1px solid #444; resize: vertical; outline: none; box-sizing: border-box;">{{ user_code }}</textarea>
+
+            <!-- Custom Input for Form Submission -->
+            <div style="margin-top: 10px;">
+                <label style="font-size: 13px; color: #aaa;">Custom Input (for testing):</label>
+                <textarea name="custom_input" rows="2" style="width: 100%; background: #1e1e1e; color: #fff; padding: 8px; border-radius: 4px; border: 1px solid #444; resize: none; box-sizing: border-box;" placeholder="Enter custom input here...">{{ custom_input }}</textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button type="submit" name="action" value="custom_run" style="background: #007acc; color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold;">Run Code</button>
+                <button type="submit" name="action" value="submit" style="background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold;">Submit Solution</button>
+                <button type="button" id="review-btn" onclick="fetchCodeReview({{ problem.id }})" style="background: #e67e22; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔍 Review My Code</button>
+            </div>
+        </form>
+
+        <!-- AI Code Review Box -->
+        <div id="review-box" style="margin-top: 10px; padding: 12px; background: #1e1e1e; border-radius: 5px; border: 1px solid #444; display: none;">
+            <strong style="color: #e67e22;">AI Code Review & Analysis:</strong>
+            <div id="review-text" style="margin-top: 8px; color: #dcdcdc; font-size: 13px; white-space: pre-wrap; line-height: 1.5;"></div>
+        </div>
+
+        <!-- Custom Output Display from Form Submission -->
+        {% if custom_output %}
+        <div style="margin-top: 10px; padding: 10px; background: #1e1e1e; border-radius: 5px; border: 1px solid #444;">
+            <strong style="color: #4ec9b0;">Console / Custom Output:</strong>
+            <pre style="margin: 5px 0 0 0; color: #dcdcdc; white-space: pre-wrap;">{{ custom_output }}</pre>
+        </div>
+        {% endif %}
+        
+        <!-- Judge Test Results Display -->
+        {% if result %}
+        <div style="margin-top: 10px; padding: 10px; background: #1e1e1e; border-radius: 5px; border: 1px solid #444;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong>Overall Status: </strong> 
+                <span style="color: {% if result == 'Accepted' %}#28a745{% else %}#dc3545{% endif %}; font-weight: bold; font-size: 16px;">{{ result }}</span>
+            </div>
+
+            {% if test_results %}
+            <div style="max-height: 120px; overflow-y: auto; border-top: 1px solid #333; padding-top: 5px;">
+                {% for tr in test_results %}
+                <div style="font-size: 12px; margin-bottom: 3px; color: {% if tr.passed %}#28a745{% else %}#dc3545{% endif %};">
+                    Test Case #{{ tr.test_case }}: {% if tr.passed %}Passed{% else %}Failed (Output: {{ tr.output }} | Expected: {{ tr.expected }}){% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- JavaScript Logic -->
+<script>
+function fetchHint(problemId) {
+    const hintBox = document.getElementById('hint-box');
+    const hintText = document.getElementById('hint-text');
+    hintBox.style.display = 'block';
+    hintText.innerText = 'Generating hint...';
+
+    fetch(`/get-hint/${problemId}/`, {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        hintText.innerText = data.hint;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        hintText.innerText = 'Error fetching hint.';
+    });
+}
+
+function fetchCodeReview(problemId) {
+    const reviewBox = document.getElementById('review-box');
+    const reviewText = document.getElementById('review-text');
+    const codeEditorContent = document.getElementById('code-editor').value;
+
+    reviewBox.style.display = 'block';
+    reviewText.innerText = 'Analyzing your code for bugs and optimizations...';
+
+    fetch(`/review-code/${problemId}/?code=${encodeURIComponent(codeEditorContent)}`, {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        reviewText.innerText = data.review;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        reviewText.innerText = 'Error fetching code review.';
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const editorialBtn = document.getElementById('editorial-toggle');
+    const collapseDiv = document.getElementById('collapseEditorial');
+    
+    if (editorialBtn && collapseDiv) {
+        editorialBtn.addEventListener('click', function() {
+            if (collapseDiv.style.display === 'none' || collapseDiv.style.display === '') {
+                collapseDiv.style.display = 'block';
+            } else {
+                collapseDiv.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+<script>
+async function fetchHint(problemId) {
+    const hintBtn = document.getElementById("hint-btn");
+    const hintBox = document.getElementById("hint-box");
+    const hintText = document.getElementById("hint-text");
+
+    hintBtn.disabled = true;
+    hintBtn.innerText = "⏳ Generating...";
+
+    hintBox.style.display = "block";
+    hintText.innerText = "AI is generating a hint...";
+
+    try {
+        const response = await fetch(`/get-hint/${problemId}/`);
+        const data = await response.json();
+
+        console.log("Hint response:", data);
+
+        if (data.hint) {
+            hintText.innerText = data.hint;
+        } else if (data.error) {
+            hintText.innerText = "❌ " + data.error;
+        } else {
+            hintText.innerText = "❌ Could not generate hint.";
+        }
+    } catch (error) {
+        console.error("Hint Error:", error);
+        hintText.innerText = "❌ Error generating hint.";
+    }
+
+    hintBtn.disabled = false;
+    hintBtn.innerText = "💡 Get AI Hint";
+}
+
+async function fetchCodeReview(problemId) {
+    const reviewBtn = document.getElementById("review-btn");
+    const reviewBox = document.getElementById("review-box");
+    const reviewText = document.getElementById("review-text");
+
+    const code = document.getElementById("code-editor").value;
+
+    reviewBtn.disabled = true;
+    reviewBtn.innerText = "⏳ Reviewing...";
+
+    reviewBox.style.display = "block";
+    reviewText.innerText = "AI is reviewing your code...";
+
+    try {
+        const response = await fetch(
+            `/review-code/${problemId}/?code=${encodeURIComponent(code)}`
+        );
+
+        const data = await response.json();
+
+        console.log("Review response:", data);
+
+        if (data.review) {
+            reviewText.innerText = data.review;
+        } else if (data.error) {
+            reviewText.innerText = "❌ " + data.error;
+        } else {
+            reviewText.innerText = "❌ Could not generate review.";
+        }
+    } catch (error) {
+        console.error("Review Error:", error);
+        reviewText.innerText = "❌ Error generating review.";
+    }
+
+    reviewBtn.disabled = false;
+    reviewBtn.innerText = "🔍 Review My Code";
+}
+</script>
+{% endblock %}
