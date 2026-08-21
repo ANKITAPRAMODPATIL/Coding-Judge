@@ -153,5 +153,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.parse('postgresql://postgres:EO3DaXUWpI9EcZfo@db.ntnfiapftvcwkapdvmpn.supabase.co:5432/postgres')
+    'default': dj_database_url.parse(
+        os.environ.get('DATABASE_URL', 'postgresql://postgres:EO3DaXUWpI9EcZfo@db.ntnfiapftvcwkapdvmpn.supabase.co:5432/postgres')
+    )
 }
