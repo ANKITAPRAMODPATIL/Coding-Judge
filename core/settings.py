@@ -153,6 +153,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 # CELERY_TIMEZONE = 'Asia/Kolkata'
 
 ASGI_APPLICATION = 'core.asgi.application'
+
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [

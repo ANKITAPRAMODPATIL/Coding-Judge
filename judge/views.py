@@ -282,7 +282,7 @@ def submission_history(request):
     submissions = Submission.objects.filter(user=request.user).select_related('problem').order_by('-submitted_at')
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
-GEMINI_API_KEY="AQ.Ab8RN6L4-IpOa38ayasARRtCddT_eM4yhMDvUZqL6rP2FNzRvA"
+GEMINI_API_KEY="AQ.Ab8RN6K5loWPGK7Bro06b1BEFyW48v-WhYB8Dmi5E14nkldFog"
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
@@ -308,7 +308,7 @@ Problem Description:
 {problem.description}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
 
         payload = {
             "contents": [
@@ -414,7 +414,7 @@ Student Code:
 {user_code}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
                 {
