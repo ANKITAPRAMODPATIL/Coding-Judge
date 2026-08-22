@@ -43,6 +43,7 @@ from .models import Roadmap
 from django.db.models import Count
 from django.db.models.functions import TruncDate
 from dotenv import load_dotenv
+from django.conf import settings
 
 load_dotenv()
 
@@ -311,7 +312,7 @@ Title:
 Problem Description:
 {problem.description}
 """
-
+        GEMINI_API_KEY = settings.GEMINI_API_KEY
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
@@ -416,7 +417,7 @@ Description:
 Student Code:
 {user_code}
 """
-
+        GEMINI_API_KEY = settings.GEMINI_API_KEY
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
