@@ -281,7 +281,6 @@ def submission_history(request):
     submissions = Submission.objects.filter(user=request.user).select_related('problem').order_by('-submitted_at')
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
-
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
@@ -296,8 +295,6 @@ Rules:
 - Use simple English.
 - Do not give the complete solution.
 - Do not write code.
-- Do not use headings like "Here is a hint".
-- Do not use "Bonus Tip".
 - Directly give the hint.
 
 Title:
@@ -305,16 +302,19 @@ Title:
 
 Problem Description:
 {problem.description}
-""" 
-        GEMINI_API_KEY = settings.GEMINI_API_KEY
-        
-        if not GEMINI_API_KEY:
+"""
+
+        if not settings.GEMINI_API_KEY:
             return JsonResponse({
-               "error": "Gemini API key is not configured on the server."
+                "error": "Gemini API key is not configured on the server."
             })
-        
-       
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/"
+            "models/gemini-3.6-flash:generateContent"
+            f"?key={settings.GEMINI_API_KEY}"
+        )
+
         payload = {
             "contents": [
                 {
@@ -379,7 +379,7 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-   
+    
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
@@ -405,8 +405,6 @@ Rules:
 - Use simple and clear English.
 - Be concise.
 - Do not rewrite the complete solution.
-- Do not add unnecessary introductions.
-- Do not use markdown headings like ###.
 - Mention "None" if there are no bugs.
 
 Problem:
@@ -418,12 +416,18 @@ Description:
 Student Code:
 {user_code}
 """
-        GEMINI_API_KEY = settings.GEMINI_API_KEY
-        if not GEMINI_API_KEY:
-              return JsonResponse({
-                   "error": "Gemini API key is not configured on the server."
-                })
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}" 
+
+        if not settings.GEMINI_API_KEY:
+            return JsonResponse({
+                "error": "Gemini API key is not configured on the server."
+            })
+
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/"
+            "models/gemini-3.6-flash:generateContent"
+            f"?key={settings.GEMINI_API_KEY}"
+        )
+
         payload = {
             "contents": [
                 {
