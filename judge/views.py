@@ -46,11 +46,6 @@ from django.conf import settings
 
 load_dotenv()
 
-print("ENV KEY =", os.getenv("GEMINI_API_KEY"))
-GEMINI_API_KEY = settings.GEMINI_API_KEY
-
-print("VARIABLE KEY =", GEMINI_API_KEY)
-
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
         profile, _ = UserProfile.objects.get_or_create(user=user)
