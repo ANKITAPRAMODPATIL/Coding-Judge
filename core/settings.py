@@ -16,6 +16,9 @@ import dj_database_url
 import os
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+print("=== GEMINI CHECK ===")
+print("GEMINI KEY EXISTS:", bool(GEMINI_API_KEY))
+print("GEMINI KEY LENGTH:", len(GEMINI_API_KEY))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
