@@ -154,5 +154,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 ASGI_APPLICATION = 'core.asgi.application'
 
-
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://coding-judge-production.up.railway.app',
+]
