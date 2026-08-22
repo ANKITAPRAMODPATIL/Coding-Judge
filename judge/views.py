@@ -45,7 +45,7 @@ from django.db.models.functions import TruncDate
 from dotenv import load_dotenv
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+print("GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
 
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
@@ -374,7 +374,7 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-    
+   
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
@@ -479,7 +479,7 @@ Student Code:
         return JsonResponse({
             "error": str(e)
         })
-    
+   
 def join_contest(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
     contest.participants.add(request.user)
