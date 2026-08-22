@@ -285,6 +285,7 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
+        print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
         problem = Problem.objects.get(id=problem_id)
 
         prompt = f"""
@@ -384,6 +385,7 @@ Problem Description:
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
+        print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
 
