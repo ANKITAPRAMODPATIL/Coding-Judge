@@ -280,15 +280,16 @@ def profile_view(request):
 def submission_history(request):
     submissions = Submission.objects.filter(user=request.user).select_related('problem').order_by('-submitted_at')
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
 
-        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
 
-        if not gemini_key:
+        if not api_key:
             return JsonResponse({
                 "error": "Gemini API key is not configured on the server."
             })
@@ -313,24 +314,20 @@ Problem Description:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/"
             "models/gemini-2.5-flash:generateContent"
-            f"?key={gemini_key}"
+            f"?key={api_key}"
         )
-
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
 
         response = requests.post(
             url,
-            json=payload,
+            json={
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": prompt}
+                        ]
+                    }
+                ]
+            },
             timeout=30
         )
 
@@ -382,21 +379,22 @@ Problem Description:
             "error": str(e)
         })
 
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
-        user_code = request.GET.get('code', '')
+        user_code = request.GET.get("code", "")
 
         if not user_code.strip():
             return JsonResponse({
                 "error": "Please write some code before requesting a review."
             })
 
-        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
 
-        if not gemini_key:
+        if not api_key:
             return JsonResponse({
                 "error": "Gemini API key is not configured on the server."
             })
@@ -429,24 +427,20 @@ Student Code:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/"
             "models/gemini-2.5-flash:generateContent"
-            f"?key={gemini_key}"
+            f"?key={api_key}"
         )
-
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
 
         response = requests.post(
             url,
-            json=payload,
+            json={
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": prompt}
+                        ]
+                    }
+                ]
+            },
             timeout=30
         )
 
@@ -480,7 +474,7 @@ Student Code:
 
         if not review:
             return JsonResponse({
-                "error": "Gemini returned an empty review."
+                "error": "Gemini returned an empty code review."
             })
 
         return JsonResponse({
@@ -497,6 +491,13 @@ Student Code:
         return JsonResponse({
             "error": str(e)
         })
+
+
+
+def join_contest(request, contest_id):
+    contest = get_object_or_404(Contest, id=contest_id)
+    contest.participants.add(request.user)
+    return redirect('contest_detail', contest_id=contest.id)
 
 @login_required(login_url='/login/')
 def contest_detail(request, contest_id):
@@ -1011,3 +1012,9 @@ def admin_analytics_dashboard(request):
 @login_required(login_url='/login/')
 def contest_list(request):
     return render(request, 'judge/contest_list.html')
+
+@login_required(login_url='/login/')
+def join_contest(request, contest_id):
+    contest = get_object_or_404(Contest, id=contest_id)
+    contest.participants.add(request.user)
+    return redirect('contest_detail', contest_id=contest.id)
