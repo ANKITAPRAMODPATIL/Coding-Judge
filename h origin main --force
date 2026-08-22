@@ -1,0 +1,29 @@
+[33m7a4e5cc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Successfully integrated and verified Gemini API key
+[33mfad2fd8[m Fix contest join Setting
+[33m32175a2[m Fix contest join view
+[33m11566ed[m Restore Gemini AI hint and code review
+[33m3b277f5[m Fix AI Hint and Code Review using Groq
+[33me74727e[m Fix AI API environment variable
+[33m4857104[m Check Gemini key in hint endpoint
+[33m30d6e5e[m Fix Gemini environment variable
+[33mbd0828b[m Check Gemini environment variable
+[33mb9c110b[m Fix Gemini API key loading
+[33m7bf64c6[m Debug Gemini API key
+[33m8e7fc23[m fix AI hint and review javascript
+[33ma56efb8[m fix problem detail template
+[33m7544eac[m Fix Gemini hint and review
+[33m42fd162[m Fix Gemini hint and review
+[33m0f5417d[m Fix Gemini API key
+[33mb237963[m Fix Gemini API configuration
+[33mb8fc4a6[m Fix Gemini AI integration
+[33m6754e9e[m Fix Gemini environment variable
+[33mb987f7f[m Fix Gemini API environment variable
+[33mfe7e06b[m Fix Gemini API key
+[33mda7bf4d[m add debug print for gemini key
+[33m8ff69df[m add print for debugging gemini key
+[33m0f7c6fa[m add CSRF trusted origins for railway
+[33m15f9b7d[m fix allowed hosts for railway
+[33md65c4dc[m update database settings with ssl_require
+[33m6d7a94b[m fix database url settings
+[33m89a5854[m Add railway.json for Docker builder
+[33m8c0ffa6[m Remove cache files and secure API keys

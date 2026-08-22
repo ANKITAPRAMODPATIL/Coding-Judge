@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import requests
+from . import views
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models.functions import TruncDate
@@ -42,9 +43,9 @@ from .models import Roadmap
 from django.db.models import Count
 from django.db.models.functions import TruncDate
 from dotenv import load_dotenv
-from django.conf import settings
 
 load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
@@ -281,18 +282,12 @@ def submission_history(request):
     submissions = Submission.objects.filter(user=request.user).select_related('problem').order_by('-submitted_at')
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
+GEMINI_API_KEY="AQ.Ab8RN6L4-IpOa38ayasARRtCddT_eM4yhMDvUZqL6rP2FNzRvA"
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
-
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-
-        if not api_key:
-            return JsonResponse({
-                "error": "Gemini API key is not configured on the server."
-            })
 
         prompt = f"""
 Give ONE short coding hint for this programming problem.
@@ -302,6 +297,8 @@ Rules:
 - Use simple English.
 - Do not give the complete solution.
 - Do not write code.
+- Do not use headings like "Here is a hint".
+- Do not use "Bonus Tip".
 - Directly give the hint.
 
 Title:
@@ -311,28 +308,28 @@ Problem Description:
 {problem.description}
 """
 
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/"
-            "models/gemini-2.5-flash:generateContent"
-            f"?key={api_key}"
-        )
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
 
         response = requests.post(
             url,
-            json={
-                "contents": [
-                    {
-                        "parts": [
-                            {"text": prompt}
-                        ]
-                    }
-                ]
-            },
+            json=payload,
             timeout=30
         )
 
-        print("Gemini Hint Status:", response.status_code)
-        print("Gemini Hint Response:", response.text)
+        print("Gemini Status:", response.status_code)
+        print("Gemini Response:", response.text)
 
         data = response.json()
 
@@ -356,7 +353,6 @@ Problem Description:
             .get("content", {})
             .get("parts", [{}])[0]
             .get("text", "")
-            .strip()
         )
 
         if not hint:
@@ -378,25 +374,17 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-
-
+    
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
-        user_code = request.GET.get("code", "")
+        user_code = request.GET.get('code', '')
 
         if not user_code.strip():
             return JsonResponse({
                 "error": "Please write some code before requesting a review."
-            })
-
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-
-        if not api_key:
-            return JsonResponse({
-                "error": "Gemini API key is not configured on the server."
             })
 
         prompt = f"""
@@ -412,6 +400,8 @@ Rules:
 - Use simple and clear English.
 - Be concise.
 - Do not rewrite the complete solution.
+- Do not add unnecessary introductions.
+- Do not use markdown headings like ###.
 - Mention "None" if there are no bugs.
 
 Problem:
@@ -424,23 +414,22 @@ Student Code:
 {user_code}
 """
 
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/"
-            "models/gemini-2.5-flash:generateContent"
-            f"?key={api_key}"
-        )
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
 
         response = requests.post(
             url,
-            json={
-                "contents": [
-                    {
-                        "parts": [
-                            {"text": prompt}
-                        ]
-                    }
-                ]
-            },
+            json=payload,
             timeout=30
         )
 
@@ -469,12 +458,11 @@ Student Code:
             .get("content", {})
             .get("parts", [{}])[0]
             .get("text", "")
-            .strip()
         )
 
         if not review:
             return JsonResponse({
-                "error": "Gemini returned an empty code review."
+                "error": "Gemini returned an empty review."
             })
 
         return JsonResponse({
@@ -491,9 +479,7 @@ Student Code:
         return JsonResponse({
             "error": str(e)
         })
-
-
-
+    
 def join_contest(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
     contest.participants.add(request.user)
@@ -1012,9 +998,3 @@ def admin_analytics_dashboard(request):
 @login_required(login_url='/login/')
 def contest_list(request):
     return render(request, 'judge/contest_list.html')
-
-@login_required(login_url='/login/')
-def join_contest(request, contest_id):
-    contest = get_object_or_404(Contest, id=contest_id)
-    contest.participants.add(request.user)
-    return redirect('contest_detail', contest_id=contest.id)

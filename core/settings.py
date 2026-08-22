@@ -11,20 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 import dj_database_url
 
-import os
-BASE_DIR = Path(__file__).resolve().parent.parent
-GEMINI_API_KEY = "AQ.Ab8RN6L4-IpOa38ayasARRtCddT_eM4yhMDvUZqL6rP2FNzRvA"
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "test-key-placeholder")
-print("GEMINI KEY EXISTS:", bool(GEMINI_API_KEY))
-print("GEMINI KEY LENGTH:", len(GEMINI_API_KEY))
-if GEMINI_API_KEY == "test-key-placeholder" or not GEMINI_API_KEY:
-    GEMINI_CLIENT = None
-    print("Test mode: Gemini API ko skip kar diya gaya hai taaki authentication error na aaye.")
-else:
-  
-    pass
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -164,7 +153,9 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 # CELERY_TIMEZONE = 'Asia/Kolkata'
 
 ASGI_APPLICATION = 'core.asgi.application'
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://coding-judge-production.up.railway.app',
+    "https://coding-judge-production.up.railway.app",
 ]
+
