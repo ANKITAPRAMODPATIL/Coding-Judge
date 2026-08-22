@@ -45,7 +45,11 @@ from django.db.models.functions import TruncDate
 from dotenv import load_dotenv
 
 load_dotenv()
-print("GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
+
+print("ENV KEY =", os.getenv("GEMINI_API_KEY"))
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+print("VARIABLE KEY =", GEMINI_API_KEY)
 
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
@@ -309,7 +313,6 @@ Problem Description:
 """
 
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
-
         payload = {
             "contents": [
                 {
