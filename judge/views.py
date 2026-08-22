@@ -286,6 +286,8 @@ def submission_history(request):
 def get_ai_hint(request, problem_id):
     try:
         print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
+        print("GEMINI EXISTS:", bool(settings.GEMINI_API_KEY))
+        print("GEMINI LENGTH:", len(settings.GEMINI_API_KEY or ""))
         problem = Problem.objects.get(id=problem_id)
 
         prompt = f"""
@@ -386,6 +388,8 @@ Problem Description:
 def review_code(request, problem_id):
     try:
         print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
+        print("GEMINI EXISTS:", bool(settings.GEMINI_API_KEY))
+        print("GEMINI LENGTH:", len(settings.GEMINI_API_KEY or ""))
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
 
