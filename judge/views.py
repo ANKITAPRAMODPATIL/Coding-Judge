@@ -285,10 +285,14 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
-        print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
-        print("GEMINI EXISTS:", bool(settings.GEMINI_API_KEY))
-        print("GEMINI LENGTH:", len(settings.GEMINI_API_KEY or ""))
         problem = Problem.objects.get(id=problem_id)
+
+        groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+
+        if not groq_key:
+            return JsonResponse({
+                "error": "Groq API key is not configured on the server."
+            })
 
         prompt = f"""
 Give ONE short coding hint for this programming problem.
@@ -305,40 +309,30 @@ Title:
 
 Problem Description:
 {problem.description}
-"""  
-         
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip() 
-        if not settings.GEMINI_API_KEY:
-            return JsonResponse({
-                "error": "Gemini API key is not configured on the server."
-            })
-
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/"
-            "models/gemini-3.6-flash:generateContent"
-            f"?key={api_key}"
-        )
-
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
+"""
 
         response = requests.post(
-            url,
-            json=payload,
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {groq_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": 0.3,
+                "max_completion_tokens": 150
+            },
             timeout=30
         )
 
-        print("Gemini Status:", response.status_code)
-        print("Gemini Response:", response.text)
+        print("Groq Hint Status:", response.status_code)
+        print("Groq Hint Response:", response.text)
 
         data = response.json()
 
@@ -346,27 +340,22 @@ Problem Description:
             return JsonResponse({
                 "error": data.get("error", {}).get(
                     "message",
-                    "Gemini API request failed."
+                    "Groq API request failed."
                 )
             })
 
-        candidates = data.get("candidates", [])
+        choices = data.get("choices", [])
 
-        if not candidates:
+        if not choices:
             return JsonResponse({
-                "error": "Gemini did not return a hint."
+                "error": "Groq did not return a hint."
             })
 
-        hint = (
-            candidates[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("text", "")
-        )
+        hint = choices[0].get("message", {}).get("content", "").strip()
 
         if not hint:
             return JsonResponse({
-                "error": "Gemini returned an empty hint."
+                "error": "Groq returned an empty hint."
             })
 
         return JsonResponse({
@@ -383,20 +372,24 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-    
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
-        print("DEBUG GEMINI KEY EXISTS:", bool(settings.GEMINI_API_KEY))
-        print("GEMINI EXISTS:", bool(settings.GEMINI_API_KEY))
-        print("GEMINI LENGTH:", len(settings.GEMINI_API_KEY or ""))
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
 
         if not user_code.strip():
             return JsonResponse({
                 "error": "Please write some code before requesting a review."
+            })
+
+        groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+
+        if not groq_key:
+            return JsonResponse({
+                "error": "Groq API key is not configured on the server."
             })
 
         prompt = f"""
@@ -423,38 +416,29 @@ Description:
 Student Code:
 {user_code}
 """
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-        if not settings.GEMINI_API_KEY:
-            return JsonResponse({
-                "error": "Gemini API key is not configured on the server."
-            })
-
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/"
-            "models/gemini-3.6-flash:generateContent"
-            f"?key={api_key}"
-        )
-
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
 
         response = requests.post(
-            url,
-            json=payload,
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {groq_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": 0.3,
+                "max_completion_tokens": 500
+            },
             timeout=30
         )
 
-        print("Gemini Review Status:", response.status_code)
-        print("Gemini Review Response:", response.text)
+        print("Groq Review Status:", response.status_code)
+        print("Groq Review Response:", response.text)
 
         data = response.json()
 
@@ -462,27 +446,22 @@ Student Code:
             return JsonResponse({
                 "error": data.get("error", {}).get(
                     "message",
-                    "Gemini API request failed."
+                    "Groq API request failed."
                 )
             })
 
-        candidates = data.get("candidates", [])
+        choices = data.get("choices", [])
 
-        if not candidates:
+        if not choices:
             return JsonResponse({
-                "error": "Gemini did not return a code review."
+                "error": "Groq did not return a code review."
             })
 
-        review = (
-            candidates[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("text", "")
-        )
+        review = choices[0].get("message", {}).get("content", "").strip()
 
         if not review:
             return JsonResponse({
-                "error": "Gemini returned an empty review."
+                "error": "Groq returned an empty review."
             })
 
         return JsonResponse({
