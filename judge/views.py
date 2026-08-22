@@ -305,8 +305,9 @@ Title:
 
 Problem Description:
 {problem.description}
-"""
-
+"""  
+         
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip() 
         if not settings.GEMINI_API_KEY:
             return JsonResponse({
                 "error": "Gemini API key is not configured on the server."
@@ -315,7 +316,7 @@ Problem Description:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/"
             "models/gemini-3.6-flash:generateContent"
-            f"?key={settings.GEMINI_API_KEY}"
+            f"?key={api_key}"
         )
 
         payload = {
@@ -422,7 +423,7 @@ Description:
 Student Code:
 {user_code}
 """
-
+        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
         if not settings.GEMINI_API_KEY:
             return JsonResponse({
                 "error": "Gemini API key is not configured on the server."
@@ -431,7 +432,7 @@ Student Code:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/"
             "models/gemini-3.6-flash:generateContent"
-            f"?key={settings.GEMINI_API_KEY}"
+            f"?key={api_key}"
         )
 
         payload = {
