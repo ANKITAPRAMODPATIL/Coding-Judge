@@ -169,24 +169,6 @@
 
 <!-- JavaScript Logic -->
 <script>
-function fetchHint(problemId) {
-    const hintBox = document.getElementById('hint-box');
-    const hintText = document.getElementById('hint-text');
-    hintBox.style.display = 'block';
-    hintText.innerText = 'Generating hint...';
-
-    fetch(`/get-hint/${problemId}/`, {
-        method: 'GET',
-    })
-    .then(response => response.json())
-    .then(data => {
-        hintText.innerText = data.hint;
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        hintText.innerText = 'Error fetching hint.';
-    });
-}
 
 function fetchCodeReview(problemId) {
     const reviewBox = document.getElementById('review-box');
@@ -224,76 +206,3 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
-<script>
-async function fetchHint(problemId) {
-    const hintBtn = document.getElementById("hint-btn");
-    const hintBox = document.getElementById("hint-box");
-    const hintText = document.getElementById("hint-text");
-
-    hintBtn.disabled = true;
-    hintBtn.innerText = "⏳ Generating...";
-
-    hintBox.style.display = "block";
-    hintText.innerText = "AI is generating a hint...";
-
-    try {
-        const response = await fetch(`/get-hint/${problemId}/`);
-        const data = await response.json();
-
-        console.log("Hint response:", data);
-
-        if (data.hint) {
-            hintText.innerText = data.hint;
-        } else if (data.error) {
-            hintText.innerText = "❌ " + data.error;
-        } else {
-            hintText.innerText = "❌ Could not generate hint.";
-        }
-    } catch (error) {
-        console.error("Hint Error:", error);
-        hintText.innerText = "❌ Error generating hint.";
-    }
-
-    hintBtn.disabled = false;
-    hintBtn.innerText = "💡 Get AI Hint";
-}
-
-async function fetchCodeReview(problemId) {
-    const reviewBtn = document.getElementById("review-btn");
-    const reviewBox = document.getElementById("review-box");
-    const reviewText = document.getElementById("review-text");
-
-    const code = document.getElementById("code-editor").value;
-
-    reviewBtn.disabled = true;
-    reviewBtn.innerText = "⏳ Reviewing...";
-
-    reviewBox.style.display = "block";
-    reviewText.innerText = "AI is reviewing your code...";
-
-    try {
-        const response = await fetch(
-            `/review-code/${problemId}/?code=${encodeURIComponent(code)}`
-        );
-
-        const data = await response.json();
-
-        console.log("Review response:", data);
-
-        if (data.review) {
-            reviewText.innerText = data.review;
-        } else if (data.error) {
-            reviewText.innerText = "❌ " + data.error;
-        } else {
-            reviewText.innerText = "❌ Could not generate review.";
-        }
-    } catch (error) {
-        console.error("Review Error:", error);
-        reviewText.innerText = "❌ Error generating review.";
-    }
-
-    reviewBtn.disabled = false;
-    reviewBtn.innerText = "🔍 Review My Code";
-}
-</script>
-{% endblock %}

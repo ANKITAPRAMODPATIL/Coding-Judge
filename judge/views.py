@@ -47,7 +47,7 @@ from django.conf import settings
 load_dotenv()
 
 print("ENV KEY =", os.getenv("GEMINI_API_KEY"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY = settings.GEMINI_API_KEY
 
 print("VARIABLE KEY =", GEMINI_API_KEY)
 
@@ -311,7 +311,7 @@ Title:
 Problem Description:
 {problem.description}
 """ 
-        GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
+        GEMINI_API_KEY = settings.GEMINI_API_KEY
         
         if not GEMINI_API_KEY:
             return JsonResponse({
@@ -423,7 +423,7 @@ Description:
 Student Code:
 {user_code}
 """
-        GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+        GEMINI_API_KEY = settings.GEMINI_API_KEY
         if not GEMINI_API_KEY:
               return JsonResponse({
                    "error": "Gemini API key is not configured on the server."
