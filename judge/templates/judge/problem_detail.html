@@ -170,6 +170,38 @@
 <!-- JavaScript Logic -->
 <script>
 
+async function fetchHint(problemId) {
+    const hintBtn = document.getElementById("hint-btn");
+    const hintBox = document.getElementById("hint-box");
+    const hintText = document.getElementById("hint-text");
+
+    hintBtn.disabled = true;
+    hintBtn.innerText = "⏳ Generating...";
+
+    hintBox.style.display = "block";
+    hintText.innerText = "AI is generating a hint...";
+
+    try {
+        const response = await fetch(`/get-hint/${problemId}/`);
+        const data = await response.json();
+
+        if (data.hint) {
+            hintText.innerText = data.hint;
+        } else if (data.error) {
+            hintText.innerText = "❌ " + data.error;
+        } else {
+            hintText.innerText = "❌ Could not generate hint.";
+        }
+    } catch (error) {
+        console.error("Hint Error:", error);
+        hintText.innerText = "❌ Error generating hint.";
+    }
+
+    hintBtn.disabled = false;
+    hintBtn.innerText = "💡 Get AI Hint";
+}
+
+
 function fetchCodeReview(problemId) {
     const reviewBox = document.getElementById('review-box');
     const reviewText = document.getElementById('review-text');
@@ -178,23 +210,26 @@ function fetchCodeReview(problemId) {
     reviewBox.style.display = 'block';
     reviewText.innerText = 'Analyzing your code for bugs and optimizations...';
 
-    fetch(`/review-code/${problemId}/?code=${encodeURIComponent(codeEditorContent)}`, {
-        method: 'GET',
-    })
+    fetch(`/review-code/${problemId}/?code=${encodeURIComponent(codeEditorContent)}`)
     .then(response => response.json())
     .then(data => {
-        reviewText.innerText = data.review;
+        if (data.review) {
+            reviewText.innerText = data.review;
+        } else if (data.error) {
+            reviewText.innerText = "❌ " + data.error;
+        }
     })
     .catch(error => {
         console.error('Error:', error);
-        reviewText.innerText = 'Error fetching code review.';
+        reviewText.innerText = '❌ Error fetching code review.';
     });
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const editorialBtn = document.getElementById('editorial-toggle');
     const collapseDiv = document.getElementById('collapseEditorial');
-    
+
     if (editorialBtn && collapseDiv) {
         editorialBtn.addEventListener('click', function() {
             if (collapseDiv.style.display === 'none' || collapseDiv.style.display === '') {
@@ -205,5 +240,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
 </script>
+
 {% endblock %}
