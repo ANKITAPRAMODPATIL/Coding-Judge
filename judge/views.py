@@ -289,24 +289,88 @@ GEMINI_API_KEY="AQ.Ab8RN6K5loWPGK7Bro06b1BEFyW48v-WhYB8Dmi5E14nkldFog"
 def get_ai_hint(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
-        api_key = os.environ.get("GEMINI_API_KEY")
-        
-        # Standard v1 endpoint with gemini-1.5-flash which accepts standard keys
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
-        
+
+        prompt = f"""
+Give ONE short coding hint for this programming problem.
+
+Rules:
+- Maximum 2-3 sentences.
+- Use simple English.
+- Do not give the complete solution.
+- Do not write code.
+- Do not use headings like "Here is a hint".
+- Do not use "Bonus Tip".
+- Directly give the hint.
+
+Title:
+{problem.title}
+
+Problem Description:
+{problem.description}
+"""
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+
         payload = {
-            "contents": [{
-                "parts": [{"text": f"Give one short coding hint for: {problem.title}. Description: {problem.description}"}]
-            }]
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
         }
-        
-        response = requests.post(url, json=payload, timeout=10)
+
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=30
+        )
+
         data = response.json()
-        
-        hint = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "Check your constraints.")
-        return JsonResponse({"hint": hint})
+
+        if response.status_code != 200:
+            return JsonResponse({
+                "error": data.get("error", {}).get(
+                    "message",
+                    "Gemini API request failed."
+                )
+            })
+
+        candidates = data.get("candidates", [])
+
+        if not candidates:
+            return JsonResponse({
+                "error": "Gemini did not return a hint."
+            })
+
+        hint = (
+            candidates[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "")
+        )
+
+        if not hint:
+            return JsonResponse({
+                "error": "Gemini returned an empty hint."
+            })
+
+        return JsonResponse({
+            "hint": hint
+        })
+
+    except Problem.DoesNotExist:
+        return JsonResponse({
+            "error": "Problem not found."
+        })
+
     except Exception as e:
-        return JsonResponse({"hint": "Break down your logic into smaller functions."})
+        return JsonResponse({
+            "error": str(e)
+        })
     
 @csrf_exempt
 @login_required(login_url='/login/')
@@ -314,23 +378,102 @@ def review_code(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
-        api_key = os.environ.get("GEMINI_API_KEY")
-        
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
-        
+
+        if not user_code.strip():
+            return JsonResponse({
+                "error": "Please write some code before requesting a review."
+            })
+
+        prompt = f"""
+Review the student's code for this programming problem.
+
+Use exactly these three sections:
+
+1. Bugs
+2. Optimization
+3. Edge Cases
+
+Rules:
+- Use simple and clear English.
+- Be concise.
+- Do not rewrite the complete solution.
+- Do not add unnecessary introductions.
+- Do not use markdown headings like ###.
+- Mention "None" if there are no bugs.
+
+Problem:
+{problem.title}
+
+Description:
+{problem.description}
+
+Student Code:
+{user_code}
+"""
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
-            "contents": [{
-                "parts": [{"text": f"Review this code briefly for Bugs, Optimization, and Edge Cases:\n{user_code}"}]
-            }]
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
         }
-        
-        response = requests.post(url, json=payload, timeout=10)
+
+        response = requests.post(
+            url,
+            json=payload,
+            timeout=30
+        )
+
         data = response.json()
-        
-        review = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "1. Bugs: None\n2. Optimization: Good\n3. Edge Cases: Handled")
-        return JsonResponse({"review": review})
+
+        if response.status_code != 200:
+            return JsonResponse({
+                "error": data.get("error", {}).get(
+                    "message",
+                    "Gemini API request failed."
+                )
+            })
+
+        candidates = data.get("candidates", [])
+
+        if not candidates:
+            return JsonResponse({
+                "error": "Gemini did not return a code review."
+            })
+
+        review = (
+            candidates[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "")
+        )
+
+        if not review:
+            return JsonResponse({
+                "error": "Gemini returned an empty review."
+            })
+
+        return JsonResponse({
+            "review": review
+        })
+
+    except Problem.DoesNotExist:
+        return JsonResponse({
+            "error": "Problem not found."
+        })
+
     except Exception as e:
-        return JsonResponse({"review": "Code structure looks okay."})
+        return JsonResponse({
+            "error": str(e)
+        })
+
+       
     
 def join_contest(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
