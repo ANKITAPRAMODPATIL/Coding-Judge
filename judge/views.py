@@ -283,6 +283,14 @@ def submission_history(request):
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
 GEMINI_API_KEY="AQ.Ab8RN6K5loWPGK7Bro06b1BEFyW48v-WhYB8Dmi5E14nkldFog"
+import os
+import requests
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
@@ -309,6 +317,7 @@ Problem Description:
 """
 
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
+
         payload = {
             "contents": [
                 {
@@ -326,9 +335,6 @@ Problem Description:
             json=payload,
             timeout=30
         )
-
-        print("Gemini Status:", response.status_code)
-        print("Gemini Response:", response.text)
 
         data = response.json()
 
@@ -369,7 +375,6 @@ Problem Description:
         })
 
     except Exception as e:
-        print("AI Hint Error:", str(e))
         return JsonResponse({
             "error": str(e)
         })
@@ -432,9 +437,6 @@ Student Code:
             timeout=30
         )
 
-        print("Gemini Review Status:", response.status_code)
-        print("Gemini Review Response:", response.text)
-
         data = response.json()
 
         if response.status_code != 200:
@@ -474,10 +476,11 @@ Student Code:
         })
 
     except Exception as e:
-        print("AI Review Error:", str(e))
         return JsonResponse({
             "error": str(e)
         })
+
+       
     
 def join_contest(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
