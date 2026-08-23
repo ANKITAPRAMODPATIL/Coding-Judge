@@ -283,13 +283,6 @@ def submission_history(request):
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
 GEMINI_API_KEY="AQ.Ab8RN6K5loWPGK7Bro06b1BEFyW48v-WhYB8Dmi5E14nkldFog"
-import os
-import requests
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 @csrf_exempt
 @login_required(login_url='/login/')
