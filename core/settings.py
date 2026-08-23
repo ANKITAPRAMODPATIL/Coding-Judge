@@ -160,3 +160,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://coding-judge-production.up.railway.app",
 ]
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+print("GEMINI EXISTS:", bool(GEMINI_API_KEY))
+print("GEMINI LENGTH:", len(GEMINI_API_KEY))
