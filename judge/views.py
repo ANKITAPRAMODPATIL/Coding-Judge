@@ -309,7 +309,6 @@ Problem Description:
 """
 
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
-
         payload = {
             "contents": [
                 {
@@ -414,7 +413,7 @@ Student Code:
 {user_code}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6s-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
                 {
