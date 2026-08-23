@@ -290,6 +290,13 @@ def get_ai_hint(request, problem_id):
     try:
         problem = Problem.objects.get(id=problem_id)
 
+        api_key = settings.GEMINI_API_KEY.strip()
+
+        if not api_key:
+            return JsonResponse({
+                "error": "Gemini API key is not configured on the server."
+            })
+
         prompt = f"""
 Give ONE short coding hint for this programming problem.
 
@@ -298,8 +305,6 @@ Rules:
 - Use simple English.
 - Do not give the complete solution.
 - Do not write code.
-- Do not use headings like "Here is a hint".
-- Do not use "Bonus Tip".
 - Directly give the hint.
 
 Title:
@@ -309,7 +314,6 @@ Problem Description:
 {problem.description}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
                 {
@@ -323,13 +327,17 @@ Problem Description:
         }
 
         response = requests.post(
-            url,
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+            headers={
+                "x-goog-api-key": api_key,
+                "Content-Type": "application/json"
+            },
             json=payload,
             timeout=30
         )
 
-        print("Gemini Status:", response.status_code)
-        print("Gemini Response:", response.text)
+        print("Gemini Hint Status:", response.status_code)
+        print("Gemini Hint Response:", response.text)
 
         data = response.json()
 
@@ -353,6 +361,7 @@ Problem Description:
             .get("content", {})
             .get("parts", [{}])[0]
             .get("text", "")
+            .strip()
         )
 
         if not hint:
@@ -374,7 +383,8 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-    
+
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
@@ -385,6 +395,13 @@ def review_code(request, problem_id):
         if not user_code.strip():
             return JsonResponse({
                 "error": "Please write some code before requesting a review."
+            })
+
+        api_key = settings.GEMINI_API_KEY.strip()
+
+        if not api_key:
+            return JsonResponse({
+                "error": "Gemini API key is not configured on the server."
             })
 
         prompt = f"""
@@ -400,8 +417,6 @@ Rules:
 - Use simple and clear English.
 - Be concise.
 - Do not rewrite the complete solution.
-- Do not add unnecessary introductions.
-- Do not use markdown headings like ###.
 - Mention "None" if there are no bugs.
 
 Problem:
@@ -414,7 +429,6 @@ Student Code:
 {user_code}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
                 {
@@ -428,7 +442,11 @@ Student Code:
         }
 
         response = requests.post(
-            url,
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+            headers={
+                "x-goog-api-key": api_key,
+                "Content-Type": "application/json"
+            },
             json=payload,
             timeout=30
         )
@@ -458,6 +476,7 @@ Student Code:
             .get("content", {})
             .get("parts", [{}])[0]
             .get("text", "")
+            .strip()
         )
 
         if not review:
@@ -479,7 +498,6 @@ Student Code:
         return JsonResponse({
             "error": str(e)
         })
-    
 def join_contest(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
     contest.participants.add(request.user)
