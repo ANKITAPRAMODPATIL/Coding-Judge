@@ -46,7 +46,7 @@ from django.conf import settings
 from google import genai
 
 GEMINI_API_KEY = settings.GEMINI_API_KEY
-client = genai.Client(api_key=GEMINI_API_KEY)
+
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
         profile, _ = UserProfile.objects.get_or_create(user=user)
@@ -286,6 +286,7 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
         problem = Problem.objects.get(id=problem_id)
 
         prompt = f"""
@@ -337,6 +338,7 @@ Problem Description:
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
 
