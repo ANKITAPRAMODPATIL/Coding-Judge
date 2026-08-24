@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -161,5 +162,5 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-print("GEMINI EXISTS:", bool(GEMINI_API_KEY))
-print("GEMINI LENGTH:", len(GEMINI_API_KEY))
+print("GEMINI EXISTS:", bool(GEMINI_API_KEY), flush=True)
+print("GEMINI LENGTH:", len(GEMINI_API_KEY), flush=True)
