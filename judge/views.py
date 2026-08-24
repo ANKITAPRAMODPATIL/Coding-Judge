@@ -42,11 +42,11 @@ from difflib import SequenceMatcher
 from .models import Roadmap
 from django.db.models import Count
 from django.db.models.functions import TruncDate
-from dotenv import load_dotenv
 from django.conf import settings
-load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+from google import genai
 
+GEMINI_API_KEY = settings.GEMINI_API_KEY
+client = genai.Client(api_key=GEMINI_API_KEY)
 def award_xp_and_level(user, difficulty, problem_title=None):
     try:
         profile, _ = UserProfile.objects.get_or_create(user=user)
@@ -282,8 +282,6 @@ def submission_history(request):
     submissions = Submission.objects.filter(user=request.user).select_related('problem').order_by('-submitted_at')
     return render(request, 'judge/submission_history.html', {'submissions': submissions})
 
-GEMINI_API_KEY="AQ.Ab8RN6K5loWPGK7Bro06b1BEFyW48v-WhYB8Dmi5E14nkldFog"
-
 @csrf_exempt
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
@@ -309,49 +307,12 @@ Problem Description:
 {problem.description}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
-
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
-
-        response = requests.post(
-            url,
-            json=payload,
-            timeout=30
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
 
-        data = response.json()
-
-        if response.status_code != 200:
-            return JsonResponse({
-                "error": data.get("error", {}).get(
-                    "message",
-                    "Gemini API request failed."
-                )
-            })
-
-        candidates = data.get("candidates", [])
-
-        if not candidates:
-            return JsonResponse({
-                "error": "Gemini did not return a hint."
-            })
-
-        hint = (
-            candidates[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("text", "")
-        )
+        hint = response.text
 
         if not hint:
             return JsonResponse({
@@ -371,7 +332,7 @@ Problem Description:
         return JsonResponse({
             "error": str(e)
         })
-    
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
@@ -411,48 +372,12 @@ Student Code:
 {user_code}
 """
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        }
-
-        response = requests.post(
-            url,
-            json=payload,
-            timeout=30
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
 
-        data = response.json()
-
-        if response.status_code != 200:
-            return JsonResponse({
-                "error": data.get("error", {}).get(
-                    "message",
-                    "Gemini API request failed."
-                )
-            })
-
-        candidates = data.get("candidates", [])
-
-        if not candidates:
-            return JsonResponse({
-                "error": "Gemini did not return a code review."
-            })
-
-        review = (
-            candidates[0]
-            .get("content", {})
-            .get("parts", [{}])[0]
-            .get("text", "")
-        )
+        review = response.text
 
         if not review:
             return JsonResponse({
@@ -472,7 +397,7 @@ Student Code:
         return JsonResponse({
             "error": str(e)
         })
-
+    
        
     
 def join_contest(request, contest_id):
