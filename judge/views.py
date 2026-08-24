@@ -286,6 +286,8 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
+        print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY))
+        print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY))
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
         problem = Problem.objects.get(id=problem_id)
 
@@ -338,6 +340,8 @@ Problem Description:
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
+        print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY))
+        print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY))
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
