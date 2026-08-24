@@ -67,5 +67,5 @@ urlpatterns = [
     path('test-redis/', views.test_redis_view, name='test_redis'),
     path('roadmaps/', views.roadmap_list, name='roadmap_list'),
     path('roadmaps/<slug:slug>/', views.roadmap_detail, name='roadmap_detail'),
-
+    path('debug-env-check/', views.debug_env),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

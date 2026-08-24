@@ -924,3 +924,12 @@ def admin_analytics_dashboard(request):
 @login_required(login_url='/login/')
 def contest_list(request):
     return render(request, 'judge/contest_list.html')
+
+def debug_env(request):
+    env_keys = sorted(os.environ.keys())
+    return JsonResponse({
+        "all_env_keys": env_keys,
+        "has_gemini": "GEMINI_API_KEY" in os.environ,
+        "has_rawtest": "RAWTEST" in os.environ,
+        "total_count": len(env_keys)
+    })
