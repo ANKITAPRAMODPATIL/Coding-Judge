@@ -258,9 +258,10 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
+        client = genai.Client(api_key="AQ.Ab8RN6I9RI0RIfokvFmllusG-zV-MiLBUdpbDWaorLPyu8ISow")
         print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY), flush=True)
         print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY), flush=True)
-        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        
         problem = Problem.objects.get(id=problem_id)
 
         prompt = f"""
@@ -312,9 +313,10 @@ Problem Description:
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
+        client = genai.Client(api_key="AQ.Ab8RN6I9RI0RIfokvFmllusG-zV-MiLBUdpbDWaorLPyu8ISow")
         print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY), flush=True)
         print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY), flush=True)
-        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+       
         problem = Problem.objects.get(id=problem_id)
         user_code = request.GET.get('code', '')
 
