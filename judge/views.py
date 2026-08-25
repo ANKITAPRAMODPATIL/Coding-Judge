@@ -72,44 +72,16 @@ def award_xp_and_level(user, difficulty, problem_title=None):
 
 @csrf_exempt
 def register_view(request):
-  if request.method == 'POST':
-    form = UserCreationForm(request.POST)
-    if form.is_valid():
-      user = form.save(commit=False)
-      user.is_active = (
-          False 
-      )
-      user.save()
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            
+            form.save()
+            return redirect('login')  
+    else:
+        form = UserCreationForm()
 
-      token = str(uuid.uuid4())
-      UserProfile.objects.create(user=user, email_token=token)
-
-      verify_link = request.build_absolute_uri(f'/verify/{token}/')
-
-      subject = 'Verify your Email - Online Judge'
-      message = (
-          f'Hi {user.username},\n\nPlease click the link below to verify your'
-          f' email:\n{verify_link}'
-      )
-
-      try:
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
-      except Exception as e:
-        
-        print(f'Error sending verification email: {e}')
-
-      return redirect('email_verification_sent')
-  else:
-    form = UserCreationForm()
-
-  return render(request, 'judge/register.html', {'form': form})
-
+    return render(request, 'judge/register.html', {'form': form})
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)

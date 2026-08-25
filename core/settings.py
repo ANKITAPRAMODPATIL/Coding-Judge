@@ -164,6 +164,3 @@ CSRF_TRUSTED_ORIGINS = [
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 print("GEMINI EXISTS:", bool(GEMINI_API_KEY), flush=True)
 print("GEMINI LENGTH:", len(GEMINI_API_KEY), flush=True)
-print("TEST KEY CHECK:", repr(os.getenv("TESTKEY", "NOT_FOUND")), flush=True)
-print("MYTEST2026 CHECK:", repr(os.getenv("MYTEST2026", "NOT_FOUND")), flush=True)
-print("RAW TEST:", repr(os.getenv("RAWTEST", "NOT_FOUND")), flush=True)
