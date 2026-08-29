@@ -289,7 +289,7 @@ Problem Description:
         # )
         print("11111111")
         response = client.interactions.create(
-            model="gemini-2.5-flash-lite",
+            model="gemini-3.5-flash-lite",
             input=prompt
         )
         print("222222")
@@ -369,7 +369,7 @@ Student Code:
             #contents=prompt
         #)
         response = client.interactions.create(
-                    model="gemini-2.5-flash-lite",
+                    model="gemini-3.5-flash-lite",
                     input=prompt
                 )
 
