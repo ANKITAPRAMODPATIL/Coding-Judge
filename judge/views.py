@@ -368,12 +368,15 @@ Student Code:
             #model="gemini-2.5-flash",
             #contents=prompt
         #)
+        # response = client.interactions.create(
+        #             model="gemini-3.5-flash-lite",
+        #             input=prompt
+        #         )
         response = client.interactions.create(
-                    model="gemini-3.5-flash-lite",
-                    input=prompt
-                )
-
-        review = response.text
+            model="gemini-3.5-flash-lite",
+            input=prompt
+        )
+        review = response.output_text
 
         if not review:
             return JsonResponse({
