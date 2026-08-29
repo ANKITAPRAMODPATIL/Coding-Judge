@@ -287,17 +287,19 @@ Problem Description:
         #     model="gemini-2.5-flash",
         #     contents=prompt
         # )
+        print("11111111")
         response = client.interactions.create(
             model="gemini-3.7-flash",
             input=prompt
         )
-
+        print("222222")
         print(response)
-
+        print("3333333")
         # hint = response.text
         hint = response.output_text
+        print("444444")
         print(hint)
-
+        
         if not hint:
             return JsonResponse({
                 "error": "Gemini returned an empty hint."
@@ -313,6 +315,7 @@ Problem Description:
         })
 
     except Exception as e:
+        print(666666)
         print(e)
         return JsonResponse({
             "error": str(e)
