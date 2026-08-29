@@ -369,7 +369,7 @@ Student Code:
             #contents=prompt
         #)
         response = client.interactions.create(
-                    model="gemini-3.7-flash",
+                    model="gemini-2.5-flash-lite",
                     input=prompt
                 )
 
