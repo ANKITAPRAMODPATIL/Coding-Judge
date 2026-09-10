@@ -96,7 +96,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-@login_required(login_url='/login/')
+
 def problem_list(request):
     query = request.GET.get('q', '')
     difficulty = request.GET.get('difficulty', '')
@@ -107,7 +107,7 @@ def problem_list(request):
         problems = problems.filter(difficulty__iexact=difficulty)
     return render(request, 'judge/problem_list.html', {'problems': problems, 'query': query, 'selected_difficulty': difficulty})
 
-@login_required(login_url='/login/')
+
 def problem_detail(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
     result = None
@@ -231,7 +231,6 @@ def execute_code(code, language, input_data):
     return "Unsupported Language"
 
 
-@login_required(login_url='/login/') 
 def leaderboard_view(request):
     profiles = UserProfile.objects.order_by('-score', '-rating')
     return render(request, 'judge/leaderboard.html', {'profiles': profiles})
@@ -258,9 +257,9 @@ def submission_history(request):
 @login_required(login_url='/login/')
 def get_ai_hint(request, problem_id):
     try:
-        client = genai.Client(api_key="AQ.Ab8RN6L4Ud1dvXSt-mUpCssduHwejlfueSCPvQO61qPsnnW6YA")
+        client = genai.Client(api_key="AQ.Ab8RN6K5yU3LXsLNESqKQ9dJ1eVeFQ-FRV8IW7hJ_khj8pw7JQ")
         # print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY), flush=True)
-        # print("DEBUG KEY LENGTH:", len(settings.GEMINI_), flush=True)
+        # print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY), flush=True)
         
         problem = Problem.objects.get(id=problem_id)
 
@@ -287,35 +286,34 @@ Problem Description:
         #     model="gemini-2.5-flash",
         #     contents=prompt
         # )
-        print("11111111")
+        print(3333333333)
         response = client.interactions.create(
-            model="gemini-3.5-flash-lite",
+            model="gemini-3.7-flash",
             input=prompt
         )
-        print("222222")
+        print(444444444)
         print(response)
-        print("3333333")
+
         # hint = response.text
         hint = response.output_text
-        print("444444")
         print(hint)
-        
+        print(55555555)
         if not hint:
             return JsonResponse({
                 "error": "Gemini returned an empty hint."
             })
-
+        print(6666666)
         return JsonResponse({
             "hint": hint
         })
-
+  
     except Problem.DoesNotExist:
         return JsonResponse({
             "error": "Problem not found."
         })
-
+        print("88888888888")
     except Exception as e:
-        print(666666)
+        print(999999)
         print(e)
         return JsonResponse({
             "error": str(e)
@@ -325,7 +323,7 @@ Problem Description:
 @login_required(login_url='/login/')
 def review_code(request, problem_id):
     try:
-        client = genai.Client(api_key="AQ.Ab8RN6L4Ud1dvXSt-mUpCssduHwejlfueSCPvQO61qPsnnW6YA")
+        client = genai.Client(api_key="")
         #print("DEBUG KEY VALUE:", repr(settings.GEMINI_API_KEY), flush=True)
         #print("DEBUG KEY LENGTH:", len(settings.GEMINI_API_KEY), flush=True)
        
@@ -368,15 +366,12 @@ Student Code:
             #model="gemini-2.5-flash",
             #contents=prompt
         #)
-        # response = client.interactions.create(
-        #             model="gemini-3.5-flash-lite",
-        #             input=prompt
-        #         )
         response = client.interactions.create(
-            model="gemini-3.5-flash-lite",
-            input=prompt
-        )
-        review = response.output_text
+                    model="gemini-3.7-flash",
+                    input=prompt
+                )
+
+        review = response.text
 
         if not review:
             return JsonResponse({
@@ -412,7 +407,6 @@ def contest_detail(request, contest_id):
     problems = contest.problems.all()
     return render(request, 'judge/contest_detail.html', {'contest': contest, 'problems': problems})
 
-@login_required(login_url='/login/')
 def contest_leaderboard(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
     participants_data = []
@@ -621,7 +615,7 @@ def remove_avatar(request):
             
     return redirect('profile')   
  
-@login_required(login_url='/login/')
+
 def monthly_leaderboard_view(request):
     now = timezone.now()
     start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -655,7 +649,7 @@ def update_user_streak(user):
 def ai_tools_view(request):
     return render(request, 'judge/ai_tools.html')
 
-@login_required(login_url='/login/')
+
 def practice_workspace_view(request):
     bookmarks = UserWorkspace.objects.filter(user=request.user, item_type='BOOKMARK')
     favourites = UserWorkspace.objects.filter(user=request.user, item_type='FAVOURITE')
@@ -670,7 +664,7 @@ def practice_workspace_view(request):
     }
     return render(request, 'judge/practice_workspace.html', context)
 
-@login_required(login_url='/login/')
+
 def add_comment(request, model_name, pk):
     if request.method == 'POST':
         text = request.POST.get('text')
@@ -697,7 +691,7 @@ def add_reply(request, comment_id):
             )
     return redirect(request.META.get('HTTP_REFERER', 'problem_list'))
 
-@login_required(login_url='/login/')
+
 def handle_vote(request, model_name, pk, vote_val):
     model_type = ContentType.objects.get(model=model_name)
     vote_obj, created = Vote.objects.get_or_create(
@@ -714,7 +708,6 @@ def handle_vote(request, model_name, pk, vote_val):
             vote_obj.save()
     return redirect(request.META.get('HTTP_REFERER', 'problem_list'))
 
-@login_required(login_url='/login/')
 def user_activity_heatmap(request):
     start_date = date.today() - timedelta(days=365)
     activities = (
@@ -727,7 +720,7 @@ def user_activity_heatmap(request):
     context = {'activity_dict': activity_dict}
     return render(request, 'judge/heatmap.html', context)
 
-@login_required(login_url='/login/')
+
 def topic_wise_progress(request):
     solved_submissions = Submission.objects.filter(user=request.user, status='Accepted').select_related('problem')
     topic_stats = {}
@@ -742,13 +735,13 @@ def topic_wise_progress(request):
     context = {'topic_stats': topic_stats}
     return render(request, 'judge/topic_progress.html', context)
 
-@login_required(login_url='/login/')
+
 def company_sheet(request, company_name):
     problems = Problem.objects.filter(company_tag__iexact=company_name)
     context = {'problems': problems, 'company_name': company_name}
     return render(request, 'judge/company_sheet.html', context)
 
-@login_required(login_url='/login/')
+
 def dashboard_view(request):
     user_badges = UserBadge.objects.filter(user=request.user)
     context = {'user_badges': user_badges}
@@ -759,7 +752,7 @@ def generate_certificate(request):
     context = {'certificate_user': request.user}
     return render(request, 'judge/certificate.html', context)
 
-@login_required(login_url='/login/')
+
 def analytics_dashboard(request):
     total_users = User.objects.count()
     total_problems = Problem.objects.count()
