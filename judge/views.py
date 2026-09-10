@@ -540,7 +540,7 @@ def editorial_view(request, problem_id):
         'editorial': editorial
     })
 
-@login_required(login_url='/login/')
+
 def problem_discussions(request, problem_id):
     problem = get_object_or_404(Problem, id=problem_id)
     discussions = problem.discussions.all().order_by('-created_at')
@@ -560,7 +560,7 @@ def problem_discussions(request, problem_id):
         'discussions': discussions
     })
 
-@login_required(login_url='/login/')
+
 def discussion_detail(request, pk):
     discussion = get_object_or_404(Discussion, pk=pk)
     if request.method == 'POST':
@@ -809,6 +809,7 @@ def test_redis_view(request):
     val = cache.get('test_key')
     return HttpResponse(f"Redis Test Output: {val}")
 
+@login_required(login_url='/login/')
 def submit_code_view(request):
     print(">>> SUBMIT CODE VIEW IS CALLED! <<<")
     sample_code = 'print("Hello, Online Judge!")'
