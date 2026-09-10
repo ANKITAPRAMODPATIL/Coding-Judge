@@ -128,7 +128,8 @@ def problem_detail(request, problem_id):
             log_user_action(request.user, "Custom Run Code", request, details=f"Problem ID: {problem_id} ({selected_lang})")
             
         elif action == 'submit':
-            
+            if not request.user.is_authenticated:
+               return redirect('/login/')
             cache_key = f"submission_cooldown_{request.user.id}"
             if cache.get(cache_key):
                 result = 'Spam Protection: Please wait a few seconds before submitting again.'
