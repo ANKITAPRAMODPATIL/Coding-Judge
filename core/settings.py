@@ -156,6 +156,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 ASGI_APPLICATION = 'core.asgi.application'
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://coding-judge.onrender.com']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://coding-judge-production.up.railway.app",
